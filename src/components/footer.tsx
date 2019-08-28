@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const FooterWrapper = styled.footer`
   flex-shrink: 0;
-  background-color: #1f1f1f;
+  background-color: ${props => props.theme.defaultBrand};
   height: 128px;
 `;
 
