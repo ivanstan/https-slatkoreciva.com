@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from "styled-components";
+import { Blog } from "../services/BlogService";
 import Each from "react-each";
-import {Cards} from "../services/cards";
-import ScrollAnimation from 'react-animate-on-scroll';
+import { Link } from "react-router-dom";
 
 const Title = styled.h1`
   font-family: 'Yellowtail', cursive;
@@ -69,41 +69,41 @@ const Me = styled.div`
 
 export class Home extends React.Component<any, any> {
 
-  public render() {
-    return <>
-      <Header className="mb-5">
-        <Title>Slatkorečiva</Title>
-      </Header>
-      <div className="container mb-5">
+    readonly state = {
+        posts: []
+    };
 
-        <section className="row mb-5">
+    componentDidMount(): void {
+        Blog.getCollection().then((posts: any) => {
+            this.setState({ posts: posts })
+        })
+    }
 
-          <Roses className={"col-md-4"}/>
+    public getDate(data: any) {
+        const date = new Date(data.value)
 
-          <div className={"col-md-4"}>
-          <Me />
-          </div>
+        return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`
+    }
 
-        </section>
+    public render() {
+        const { posts } = this.state;
 
-      <section className="row">
-        <Aside className="col-md-3">
-          <TitleCards>Motivacijske kartice</TitleCards>
-          <TextCards>Svakog dana uz kafu umesto kockice šećera.</TextCards>
-          <Arrow />
-        </Aside>
-        <main className="col-md-9 d-flex flex-wrap">
-          <Each items={Cards.getLatest(9)} renderItem={(item: string, index: number) => (
-            <Card key={index}>
-              <ScrollAnimation animateIn="rotateIn" animateOut="rotateOut"
-                               delay={(index / 3 * 300)}>
-                <img src={item} width="100%" alt={item} />
-              </ScrollAnimation>
-            </Card>
-          )} />
-        </main>
-      </section>
-      </div>
-    </>;
-  }
+        return <>
+            <Header className="mb-5">
+                <Title>Slatkorečiva</Title>
+            </Header>
+
+            <div className="container mb-5">
+                <Each items={posts} renderItem={(article: any, index: number) => (
+                    <article className="mb-5" key={index}>
+                        <span className="text-muted">{this.getDate(article.created[0])}</span>
+                        <Link to={'post/' + article.nid[0].value}>
+                            <h2 className="h4">{article.title[0].value}</h2>
+                        </Link>
+                        {article.body[0].summary}
+                    </article>
+                )}/>
+            </div>
+        </>;
+    }
 }
